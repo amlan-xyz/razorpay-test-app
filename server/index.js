@@ -1,18 +1,27 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const paymentRoute = require("./routes/payments");
+import cors from "cors";
+import dotenv, { config } from "dotenv";
+import express from "express";
+import { connectDB } from "./db.js";
+
+config(dotenv);
+connectDB();
 
 const app = express();
-
-dotenv.config();
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors());
 
-//Routing
-app.use("/api/payment/", paymentRoute);
+//routes
+import paymentRoutes from "./routes/payments.routes.js";
 
-//Listening App
-const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`Listening port ${port}`));
+app.get("", (req, res) => {
+  res.status(200).json({ message: "Razorpay Payment Gateway" });
+});
+app.use("/api/payments", paymentRoutes);
+
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log("Server started at port 3001");
+});
